@@ -1,0 +1,250 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+class Cuenta {
+    private String numero;
+    private double saldo;
+    private List<String> movimientos;
+
+    public Cuenta(String numero, double saldoInicial) {
+        this.numero = numero;
+        this.saldo = saldoInicial;
+        this.movimientos = new ArrayList<>();
+        registrarMovimiento("Cuenta creada con saldo inicial $" + saldoInicial);
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void depositar(double cantidad) {
+        saldo += cantidad;
+        registrarMovimiento("Depósito de $" + cantidad + ". Saldo actual: $" + saldo);
+    }
+
+    public boolean extraer(double cantidad) {
+        if (cantidad <= saldo) {
+            saldo -= cantidad;
+            registrarMovimiento("Extracción de $" + cantidad + ". Saldo actual: $" + saldo);
+            return true;
+        } else {
+            registrarMovimiento("Extracción fallida de $" + cantidad + " por saldo insuficiente.");
+            return false;
+        }
+    }
+
+    public boolean transferir(double cantidad, Cuenta cuentaDestino) {
+        if (cantidad <= saldo) {
+            saldo -= cantidad;
+            cuentaDestino.depositar(cantidad);
+            registrarMovimiento("Transferencia de $" + cantidad + " a la cuenta " + cuentaDestino.getNumero() + ". Saldo actual: $" + saldo);
+            return true;
+        } else {
+            registrarMovimiento("Transferencia fallida de $" + cantidad + " a la cuenta " + cuentaDestino.getNumero() + " por saldo insuficiente.");
+            return false;
+        }
+    }
+
+    private void registrarMovimiento(String movimiento) {
+        movimientos.add(movimiento);
+    }
+
+    public void mostrarMovimientos() {
+        System.out.println("Movimientos de la cuenta " + numero + ":");
+        for (String movimiento : movimientos) {
+            System.out.println(movimiento);
+        }
+    }
+}
+
+class Usuario {
+    private String nombre;
+    private String dni;
+    private Map<String, Cuenta> cuentas;
+
+    public Usuario(String nombre, String dni) {
+        this.nombre = nombre;
+        this.dni = dni;
+        this.cuentas = new HashMap<>();
+    }
+
+    public void agregarCuenta(String numero, double saldoInicial) {
+        Cuenta cuenta = new Cuenta(numero, saldoInicial);
+        cuentas.put(numero, cuenta);
+        System.out.println("Cuenta " + numero + " creada con saldo inicial $" + saldoInicial);
+    }
+
+    public Cuenta obtenerCuenta(String numero) {
+        return cuentas.get(numero);
+    }
+
+    public void mostrarSaldo(String numero) {
+        Cuenta cuenta = obtenerCuenta(numero);
+        if (cuenta != null) {
+            System.out.println("Saldo de la cuenta " + numero + ": $" + cuenta.getSaldo());
+        } else {
+            System.out.println("Cuenta no encontrada.");
+        }
+    }
+
+    public void mostrarMovimientos(String numero) {
+        Cuenta cuenta = obtenerCuenta(numero);
+        if (cuenta != null) {
+            cuenta.mostrarMovimientos();
+        } else {
+            System.out.println("Cuenta no encontrada.");
+        }
+    }
+
+    public String getDni() {
+        return dni;
+    }
+}
+
+class Cajero {
+    private Map<String, Usuario> usuarios;
+
+    public Cajero() {
+        usuarios = new HashMap<>();
+    }
+
+    public void agregarUsuario(String nombre, String dni) {
+        Usuario usuario = new Usuario(nombre, dni);
+        usuarios.put(dni, usuario);
+        System.out.println("Usuario " + nombre + " registrado con DNI " + dni + ".");
+    }
+
+    public Usuario obtenerUsuario(String dni) {
+        return usuarios.get(dni);
+    }
+
+    public void menu() {
+        Scanner scanner = new Scanner(System.in);
+        boolean salir = false;
+
+        while (!salir) {
+            System.out.println("\n1. Depositar");
+            System.out.println("2. Extraer");
+            System.out.println("3. Transferir");
+            System.out.println("4. Mostrar saldo");
+            System.out.println("5. Mostrar movimientos");
+            System.out.println("6. Salir");
+            System.out.print("Seleccione una opción: ");
+
+            // Validar que se ingrese un número
+            while (!scanner.hasNextInt()) {
+                System.out.println("Por favor, ingrese una opción válida (número del 1 al 6).");
+                scanner.next(); // Limpiar el buffer de entrada
+            }
+
+            int opcion = scanner.nextInt();
+
+            switch (opcion) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    System.out.print("Ingrese DNI del usuario: ");
+                    String dni = scanner.next();
+                    Usuario usuario = obtenerUsuario(dni);
+
+                    if (usuario == null) {
+                        System.out.println("Usuario no encontrado.");
+                        continue;
+                    }
+
+                    System.out.print("Ingrese número de cuenta: ");
+                    String numeroCuenta = scanner.next();
+                    Cuenta cuenta = usuario.obtenerCuenta(numeroCuenta);
+
+                    if (cuenta == null) {
+                        System.out.println("Cuenta no encontrada.");
+                        continue;
+                    }
+
+                    switch (opcion) {
+                        case 1:
+                            System.out.print("Ingrese cantidad a depositar: ");
+                            double cantidadDeposito = scanner.nextDouble();
+                            cuenta.depositar(cantidadDeposito);
+                            break;
+
+                        case 2:
+                            System.out.print("Ingrese cantidad a extraer: ");
+                            double cantidadExtraccion = scanner.nextDouble();
+                            if (!cuenta.extraer(cantidadExtraccion)) {
+                                System.out.println("No se pudo realizar la extracción. Saldo insuficiente.");
+                            }
+                            break;
+
+                        case 3:
+                            System.out.print("Ingrese cantidad a transferir: ");
+                            double cantidadTransferencia = scanner.nextDouble();
+                            System.out.print("Ingrese DNI del usuario destino: ");
+                            String dniDestino = scanner.next();
+                            Usuario usuarioDestino = obtenerUsuario(dniDestino);
+
+                            if (usuarioDestino == null) {
+                                System.out.println("Usuario destino no encontrado.");
+                                break;
+                            }
+
+                            System.out.print("Ingrese número de cuenta destino: ");
+                            String numeroCuentaDestino = scanner.next();
+                            Cuenta cuentaDestino = usuarioDestino.obtenerCuenta(numeroCuentaDestino);
+
+                            if (cuentaDestino == null) {
+                                System.out.println("Cuenta destino no encontrada.");
+                                break;
+                            }
+
+                            if (!cuenta.transferir(cantidadTransferencia, cuentaDestino)) {
+                                System.out.println("No se pudo realizar la transferencia. Saldo insuficiente.");
+                            }
+                            break;
+
+                        case 4:
+                            usuario.mostrarSaldo(numeroCuenta);
+                            break;
+
+                        case 5:
+                            usuario.mostrarMovimientos(numeroCuenta);
+                            break;
+                    }
+                    break;
+
+                case 6:
+                    salir = true;
+                    break;
+
+                default:
+                    System.out.println("Opción no válida.");
+                    break;
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Cajero cajero = new Cajero();
+        cajero.agregarUsuario("Alice", "12345678");
+        cajero.obtenerUsuario("12345678").agregarCuenta("001", 5000);
+        cajero.obtenerUsuario("12345678").agregarCuenta("002", 3000);
+
+        cajero.agregarUsuario("Bob", "87654321");
+        cajero.obtenerUsuario("87654321").agregarCuenta("003", 7000);
+
+        cajero.menu();
+    }
+}
