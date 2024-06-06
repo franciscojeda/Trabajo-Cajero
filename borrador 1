@@ -1,8 +1,26 @@
+un sistema que lleve un registro contable de las cuentas de los usuarios. (estilo home banking)
+hay usuarios q pueden depositar o extraer plata y pueden tener varias cuentas.pueden transferir plata entren usuarios y entre cuentas.
+el usuario tiene q poder decidir si extrae deposita o transfire. y se necesita un control de cuanta plata tengo disponible en la cuenta antes de poder realizar una activdad.Y que registre los movimientos de las cuentas.
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+// primero 
+public class Main {
+    public static void main(String[] args) {
+        Cajero cajero = new Cajero();
+        cajero.agregarUsuario("Alice", "12345678");
+        cajero.obtenerUsuario("12345678").agregarCuenta("001", 5000);
+        cajero.obtenerUsuario("12345678").agregarCuenta("002", 3000);
+
+        cajero.agregarUsuario("Bob", "87654321");
+        cajero.obtenerUsuario("87654321").agregarCuenta("003", 7000);
+
+        cajero.menu();
+    }
+}
 
 class Cuenta {
     private String numero;
@@ -232,19 +250,5 @@ class Cajero {
         }
 
         scanner.close();
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Cajero cajero = new Cajero();
-        cajero.agregarUsuario("Alice", "12345678");
-        cajero.obtenerUsuario("12345678").agregarCuenta("001", 5000);
-        cajero.obtenerUsuario("12345678").agregarCuenta("002", 3000);
-
-        cajero.agregarUsuario("Bob", "87654321");
-        cajero.obtenerUsuario("87654321").agregarCuenta("003", 7000);
-
-        cajero.menu();
     }
 }
