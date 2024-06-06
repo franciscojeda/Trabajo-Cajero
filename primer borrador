@@ -1,0 +1,190 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class Cuenta {
+    private String numero;
+    private double saldo;
+
+    public Cuenta(String numero, double saldoInicial) {
+        this.numero = numero;
+        this.saldo = saldoInicial;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void depositar(double cantidad) {
+        saldo += cantidad;
+        System.out.println("Depósito de $" + cantidad + " realizado. Saldo actual: $" + saldo);
+    }
+
+    public void extraer(double cantidad) {
+        if (cantidad <= saldo) {
+            saldo -= cantidad;
+            System.out.println("Extracción de $" + cantidad + " realizada. Saldo actual: $" + saldo);
+        } else {
+            System.out.println("Saldo insuficiente para realizar la extracción.");
+        }
+    }
+
+    public void transferir(double cantidad, Cuenta cuentaDestino) {
+        if (cantidad <= saldo) {
+            saldo -= cantidad;
+            cuentaDestino.depositar(cantidad);
+            System.out.println("Transferencia de $" + cantidad + " realizada a la cuenta " + cuentaDestino.getNumero() + ". Saldo actual: $" + saldo);
+        } else {
+            System.out.println("Saldo insuficiente para realizar la transferencia.");
+        }
+    }
+}
+
+class Usuario {
+    private String nombre;
+    private Map<String, Cuenta> cuentas;
+
+    public Usuario(String nombre) {
+        this.nombre = nombre;
+        this.cuentas = new HashMap<>();
+    }
+
+    public void agregarCuenta(String numero, double saldoInicial) {
+        Cuenta cuenta = new Cuenta(numero, saldoInicial);
+        cuentas.put(numero, cuenta);
+        System.out.println("Cuenta " + numero + " creada con saldo inicial $" + saldoInicial);
+    }
+
+    public Cuenta obtenerCuenta(String numero) {
+        return cuentas.get(numero);
+    }
+
+    public void mostrarSaldo(String numero) {
+        Cuenta cuenta = obtenerCuenta(numero);
+        if (cuenta != null) {
+            System.out.println("Saldo de la cuenta " + numero + ": $" + cuenta.getSaldo());
+        } else {
+            System.out.println("Cuenta no encontrada.");
+        }
+    }
+}
+
+class Cajero {
+    private Map<String, Usuario> usuarios;
+
+    public Cajero() {
+        usuarios = new HashMap<>();
+    }
+
+    public void agregarUsuario(String nombre) {
+        Usuario usuario = new Usuario(nombre);
+        usuarios.put(nombre, usuario);
+        System.out.println("Usuario " + nombre + " agregado.");
+    }
+
+    public Usuario obtenerUsuario(String nombre) {
+        return usuarios.get(nombre);
+    }
+
+    public void menu() {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n1. Depositar");
+            System.out.println("2. Extraer");
+            System.out.println("3. Transferir");
+            System.out.println("4. Mostrar saldo");
+            System.out.println("5. Salir");
+            System.out.print("Seleccione una opción: ");
+            int opcion = scanner.nextInt();
+
+            if (opcion == 5) {
+                break;
+            }
+
+            System.out.print("Ingrese nombre de usuario: ");
+            String nombre = scanner.next();
+            Usuario usuario = obtenerUsuario(nombre);
+
+            if (usuario == null) {
+                System.out.println("Usuario no encontrado.");
+                continue;
+            }
+
+            System.out.print("Ingrese número de cuenta: ");
+            String numeroCuenta = scanner.next();
+            Cuenta cuenta = usuario.obtenerCuenta(numeroCuenta);
+
+            if (cuenta == null) {
+                System.out.println("Cuenta no encontrada.");
+                continue;
+            }
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Ingrese cantidad a depositar: ");
+                    double cantidadDeposito = scanner.nextDouble();
+                    cuenta.depositar(cantidadDeposito);
+                    break;
+
+                case 2:
+                    System.out.print("Ingrese cantidad a extraer: ");
+                    double cantidadExtraccion = scanner.nextDouble();
+                    cuenta.extraer(cantidadExtraccion);
+                    break;
+
+                case 3:
+                    System.out.print("Ingrese cantidad a transferir: ");
+                    double cantidadTransferencia = scanner.nextDouble();
+                    System.out.print("Ingrese nombre de usuario destino: ");
+                    String nombreDestino = scanner.next();
+                    Usuario usuarioDestino = obtenerUsuario(nombreDestino);
+
+                    if (usuarioDestino == null) {
+                        System.out.println("Usuario destino no encontrado.");
+                        break;
+                    }
+
+                    System.out.print("Ingrese número de cuenta destino: ");
+                    String numeroCuentaDestino = scanner.next();
+                    Cuenta cuentaDestino = usuarioDestino.obtenerCuenta(numeroCuentaDestino);
+
+                    if (cuentaDestino == null) {
+                        System.out.println("Cuenta destino no encontrada.");
+                        break;
+                    }
+
+                    cuenta.transferir(cantidadTransferencia, cuentaDestino);
+                    break;
+
+                case 4:
+                    usuario.mostrarSaldo(numeroCuenta);
+                    break;
+
+                default:
+                    System.out.println("Opción no válida.");
+                    break;
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Cajero cajero = new Cajero();
+        cajero.agregarUsuario("Alice");
+        cajero.obtenerUsuario("Alice").agregarCuenta("001", 5000);
+        cajero.obtenerUsuario("Alice").agregarCuenta("002", 3000);
+
+        cajero.agregarUsuario("Bob");
+        cajero.obtenerUsuario("Bob").agregarCuenta("003", 7000);
+
+        cajero.menu();
+    }
+}
