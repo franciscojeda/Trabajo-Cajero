@@ -1,3 +1,7 @@
+//un sistema que lleve un registro contable de las cuentas de los usuarios. (estilo home banking)
+//hay usuarios q pueden depositar o extraer plata y pueden tener varias cuentas.pueden transferir plata entren usuarios y entre cuentas.
+//el usuario tiene q poder decidir si extrae deposita o transfire. y se necesita un control de cuanta plata tengo disponible en la cuenta antes de poder realizar una activdad.Y que registre los movimientos de las cuentas.
+
 import java.util.*;
 
 public class Proyecto {
