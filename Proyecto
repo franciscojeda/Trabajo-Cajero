@@ -19,19 +19,23 @@ class Cuenta {
         registrarMovimiento("Cuenta creada con saldo inicial $" + saldoInicial);
     }
 
+    // Retorna el número de cuenta
     public String getNumero() {
         return numero;
     }
 
+    // Retorna el saldo actual
     public double getSaldo() {
         return saldo;
     }
 
+    // Metodo para depositar dinero
     public void depositar(double cantidad) {
         saldo += cantidad;
         registrarMovimiento("Depósito de $" + cantidad + ". Saldo actual: $" + saldo);
     }
 
+    // Metodo para extraer dinero
     public boolean extraer(double cantidad) {
         if (cantidad <= saldo) {
             saldo -= cantidad;
@@ -43,6 +47,7 @@ class Cuenta {
         }
     }
 
+    // Metodo para transferir dinero a otra cuenta
     public boolean transferir(double cantidad, Cuenta cuentaDestino) {
         if (cantidad <= saldo) {
             saldo -= cantidad;
@@ -55,10 +60,12 @@ class Cuenta {
         }
     }
 
+    // Metodo para registrar movimientos en la cuenta
     private void registrarMovimiento(String movimiento) {
         movimientos.add(movimiento);
     }
 
+    // Metodo para mostrar los movimientos de la cuenta
     public void mostrarMovimientos() {
         System.out.println("Movimientos de la cuenta " + numero + ":");
         for (String movimiento : movimientos) {
@@ -80,6 +87,7 @@ class Usuario {
         this.contadorCuentas = 1; // Iniciar contador en 1
     }
 
+    // Metodo para agregar una nueva cuenta al usuario
     public void agregarCuenta(double saldoInicial) {
         String numeroCuenta = generarNumeroCuenta();
         Cuenta cuenta = new Cuenta(numeroCuenta, saldoInicial);
@@ -94,10 +102,12 @@ class Usuario {
         return numero;
     }
 
+    // Metodo para obtener una cuenta especifica por su número
     public Cuenta obtenerCuenta(String numero) {
         return cuentas.get(numero);
     }
 
+    // Metodo para mostrar todos los numeros de cuentas disponibles del usuario
     public void mostrarCuentas() {
         System.out.println("Cuentas disponibles:");
         for (String numeroCuenta : cuentas.keySet()) {
@@ -105,6 +115,7 @@ class Usuario {
         }
     }
 
+    // Metodo para mostrar el saldo de una cuenta seleccionada
     public void mostrarSaldo(String numero) {
         Cuenta cuenta = obtenerCuenta(numero);
         if (cuenta != null) {
@@ -114,6 +125,7 @@ class Usuario {
         }
     }
 
+    // Metodo para mostrar todos los movimientos de una cuenta seleccionada
     public void mostrarMovimientos(String numero) {
         Cuenta cuenta = obtenerCuenta(numero);
         if (cuenta != null) {
@@ -123,6 +135,7 @@ class Usuario {
         }
     }
 
+    // Metodo para obtener el DNI del usuario
     public String getDni() {
         return dni;
     }
@@ -136,6 +149,7 @@ class Cajero {
         usuarios = new HashMap<>();
     }
 
+    // Metodo para registrar un nuevo usuario
     public void registrarUsuario(String nombre, String dni) {
         if (!usuarios.containsKey(dni)) {
             Usuario usuario = new Usuario(nombre, dni);
@@ -147,6 +161,7 @@ class Cajero {
         }
     }
 
+    // Metodo para iniciar sesión de un usuario existente
     public Usuario iniciarSesion(String dni) {
         if (usuarios.containsKey(dni)) {
             usuarioActual = usuarios.get(dni);
@@ -156,17 +171,20 @@ class Cajero {
         }
     }
 
+    // Metodo para cerrar sesion del usuario actual
     public void cerrarSesion() {
         usuarioActual = null;
         System.out.println("Sesión cerrada correctamente.");
     }
 
+    // Metodo principal que muestra el menu del cajero y gestiona las opciones
     public void menu() {
         Scanner scanner = new Scanner(System.in);
         boolean salir = false;
 
         while (!salir) {
             if (usuarioActual == null) {
+                // Menu principal para usuarios no autenticados
                 System.out.println("\n1. Registrarse");
                 System.out.println("2. Iniciar sesión");
                 System.out.println("3. Salir");
@@ -175,7 +193,7 @@ class Cajero {
                 // Validar que se ingrese un número
                 while (!scanner.hasNextInt()) {
                     System.out.println("Por favor, ingrese una opción válida (número del 1 al 3).");
-                    scanner.next(); // Limpiar el buffer de entrada
+                    scanner.next(); 
                 }
 
                 int opcion = scanner.nextInt();
@@ -216,6 +234,7 @@ class Cajero {
         scanner.close();
     }
 
+    // Metodo para mostrar el menu de operaciones para usuarios autenticados
     private void menuUsuario(Scanner scanner) {
         boolean salir = false;
 
@@ -234,7 +253,7 @@ class Cajero {
             // Validar que se ingrese un número
             while (!scanner.hasNextInt()) {
                 System.out.println("Por favor, ingrese una opción válida (número del 1 al 7).");
-                scanner.next(); // Limpiar el buffer de entrada
+                scanner.next(); 
             }
 
             int opcion = scanner.nextInt();
@@ -295,7 +314,7 @@ class Cajero {
                         System.out.print("Ingrese cantidad a transferir: ");
                         while (!scanner.hasNextDouble()) {
                             System.out.println("Por favor, ingrese un valor numérico para la cantidad a transferir.");
-                            scanner.next(); // Limpiar el buffer de entrada
+                            scanner.next(); 
                         }
                         double cantidadTransferencia = scanner.nextDouble();
                         System.out.print("Ingrese DNI del usuario destino: ");
@@ -337,7 +356,7 @@ class Cajero {
 
                 case 7:
                     cerrarSesion();
-                    salir = true; // Salir del bucle interno
+                    salir = true; 
                     break;
 
                 default:
@@ -345,10 +364,5 @@ class Cajero {
                     break;
             }
         }
-    }
-
-    private void cerrarSesion() {
-        usuarioActual = null;
-        System.out.println("Sesión cerrada correctamente.");
     }
 }
